@@ -1,6 +1,7 @@
 package elements;
 
 import com.codeborne.selenide.SelenideElement;
+import model.CustomerData;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
 import static com.codeborne.selenide.Condition.exist;
@@ -18,11 +19,11 @@ public class CustomersSubPage {
         return this;
     }
 
-    public CustomersSubPage checkCustomerExists(String firstName, String lastName, String postCode) {
+    public CustomersSubPage checkCustomerExists(CustomerData customer) {
         $(By.xpath("//tr[td[1]" +
-                "[contains(., '"+firstName+"')]" +
-                " and td[2][contains(., '"+lastName+"')]" +
-                " and td[3][contains(., '"+postCode+"')]]"))
+                "[contains(., '"+customer.getFirstName()+"')]" +
+                " and td[2][contains(., '"+customer.getLastName()+"')]" +
+                " and td[3][contains(., '"+customer.getPostCode()+"')]]"))
                 .shouldBe(exist);
         return this;
     }

@@ -1,13 +1,12 @@
 package tests;
 
 import com.codeborne.selenide.Configuration;
+import dataproviders.CustomerDataProviders;
 import elements.AddCustomerSubPage;
-import org.openqa.selenium.Alert;
+import model.CustomerData;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pages.ManagerPage;
-import java.util.Random;
-import java.util.stream.Collectors;
 import static com.codeborne.selenide.Selenide.*;
 
 public class CustomerTests extends BaseTest {
@@ -31,33 +30,27 @@ public class CustomerTests extends BaseTest {
         sleep(3000);
     }
 
-    @Test
-    public void create_new_customer_and_check_him() {
+    @Test(dataProvider = "dataCustomers", dataProviderClass = CustomerDataProviders.class)
+    public void create_new_customer_and_check_him(CustomerData customer) {
         click_addCustomer();
 
         ManagerPage managerPage = page(new ManagerPage());
-        String postCode = generateRandomPostCode();
-        String firstName = generateFirstNameFromPostCode(postCode);
-        String lastName = "Test LastName";
 
         managerPage
                 .checkManagerPage()
                 .clickAddCustomerButton()
                 .checkAddCustomerForm()
-                .setFirstName(firstName)
-                .setLastName(lastName)
-                .setPostCode(postCode)
-                .clickAddCustomerButton();
-
-        Alert alert = webdriver().driver().switchTo().alert();
-        assert(alert.getText().contains("Customer added successfully"));
-        alert.accept();
+                .setFirstName(customer.getFirstName())
+                .setLastName(customer.getLastName())
+                .setPostCode(customer.getPostCode())
+                .clickAddCustomerButton()
+                .checkSuccessAlert();
 
         managerPage
                 .clickShowCustomerButton()
                 .checkCustomersTable()
-                .searchCustomer(postCode)
-                .checkCustomerExists(firstName, lastName, postCode);
+                .searchCustomer(customer.getPostCode())
+                .checkCustomerExists(customer);
 
         sleep(3000);
     }
@@ -66,68 +59,47 @@ public class CustomerTests extends BaseTest {
     public void create_duplicate_customer() {
         click_addCustomer();
 
-        String postCode = generateRandomPostCode();
-        String firstName = generateFirstNameFromPostCode(postCode);
-        String lastName = "Test LastName";
+        CustomerData customer = CustomerData.generateRandomCustomer();
 
         AddCustomerSubPage addCustomerSubPage = page(new ManagerPage())
                 .checkManagerPage()
                 .clickAddCustomerButton()
                 .checkAddCustomerForm()
-                .setFirstName(firstName)
-                .setLastName(lastName)
-                .setPostCode(postCode)
-                .clickAddCustomerButton();
+                .addNewCustomer(customer)
+                .checkSuccessAlert();
 
-        Alert alert = webdriver().driver().switchTo().alert();
-        assert(alert.getText().contains("Customer added successfully"));
-        alert.accept();
+
 
         addCustomerSubPage
-                .setFirstName(firstName)
-                .setLastName(lastName)
-                .setPostCode(postCode)
-                .clickAddCustomerButton();
-
-        alert = webdriver().driver().switchTo().alert();
-        assert(alert.getText().contains("Customer may be duplicate"));
-        alert.accept();
-
-        sleep(3000);
+                .addNewCustomer(customer)
+                .checkDuplicateAlert();
     }
 
-    @Test
-    public void try_create_new_customer_but_empty_field() {
+    @Test(dataProvider = "emptyFieldsCustomers", dataProviderClass = CustomerDataProviders.class)
+    public void try_create_new_customer_but_empty_field(CustomerData customer, String fieldName) {
         click_addCustomer();
 
-        String postCode = generateRandomPostCode();
-        String lastName = "Test LastName";
-
-        page(new ManagerPage())
+        AddCustomerSubPage addCustomerSubPage = page(new ManagerPage())
                 .checkManagerPage()
                 .clickAddCustomerButton()
                 .checkAddCustomerForm()
-                .setLastName(lastName)
-                .setPostCode(postCode)
-                .clickAddCustomerButton()
-                .checkEmptyFirstName();
+                .setFirstName(customer.getFirstName())
+                .setLastName(customer.getLastName())
+                .setPostCode(customer.getPostCode());
 
-        sleep(3000);
-    }
-
-    private String generateRandomPostCode() {
-        return new Random().ints(10, 0, 10)
-                .mapToObj(Integer::toString)
-                .collect(Collectors.joining());
-    }
-
-    private String generateFirstNameFromPostCode(String postCode) {
-        StringBuilder firstName = new StringBuilder();
-        for (int i = 0; i < postCode.length(); i += 2) {
-            int num = Integer.parseInt(postCode.substring(i, Math.min(i + 2, postCode.length())));
-            char c = (char) ('a' + (num % 26));
-            firstName.append(c);
+        switch (fieldName) {
+            case "firstName":
+                addCustomerSubPage.checkEmptyFirstName();
+                break;
+            case "lastName":
+                addCustomerSubPage.checkEmptyLastName();
+                break;
+            case "postCode":
+                addCustomerSubPage.checkEmptyPostCode();
+                break;
         }
-        return firstName.toString();
+
+        addCustomerSubPage
+                .clickAddCustomerButton();
     }
 }

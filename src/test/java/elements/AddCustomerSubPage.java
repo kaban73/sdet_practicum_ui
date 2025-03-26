@@ -1,10 +1,13 @@
 package elements;
 
 import com.codeborne.selenide.SelenideElement;
+import model.CustomerData;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.support.FindBy;
 
 import static com.codeborne.selenide.Condition.cssClass;
 import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selenide.webdriver;
 
 public class AddCustomerSubPage {
     @FindBy(xpath = "//form[@name='myForm']")
@@ -52,9 +55,41 @@ public class AddCustomerSubPage {
         return this;
     }
 
+    public AddCustomerSubPage addNewCustomer(CustomerData customer) {
+        return setFirstName(customer.getFirstName())
+                .setLastName(customer.getLastName())
+                .setPostCode(customer.getPostCode())
+                .clickAddCustomerButton();
+    }
+
     public AddCustomerSubPage checkEmptyFirstName() {
         firstNameInput.shouldHave(cssClass("ng-invalid"));
         return this;
     }
 
+    public AddCustomerSubPage checkEmptyLastName() {
+        lastNameInput.shouldHave(cssClass("ng-invalid"));
+        return this;
+    }
+
+    public AddCustomerSubPage checkEmptyPostCode() {
+        postCodeInput.shouldHave(cssClass("ng-invalid"));
+        return this;
+    }
+
+    public AddCustomerSubPage checkSuccessAlert() {
+        Alert alert = webdriver().driver().switchTo().alert();
+        assert(alert.getText().contains("Customer added successfully"));
+        alert.accept();
+
+        return this;
+    }
+
+    public AddCustomerSubPage checkDuplicateAlert() {
+        Alert alert = webdriver().driver().switchTo().alert();
+        assert(alert.getText().contains("Customer may be duplicate"));
+        alert.accept();
+
+        return this;
+    }
 }
