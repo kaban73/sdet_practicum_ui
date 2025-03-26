@@ -15,25 +15,19 @@ public class CustomerTests extends BaseTest {
         open(Configuration.baseUrl);
     }
 
-    @Test
-    public void check_managerPage_is_visible() {
-        page(new ManagerPage())
-                .checkManagerPage();
-        sleep(3000);
-    }
-    @Test
-    public void click_addCustomer() {
+    @BeforeMethod
+    private void openAddCustomerForm() {
         page(new ManagerPage())
                 .checkManagerPage()
                 .clickAddCustomerButton()
                 .checkAddCustomerForm();
-        sleep(3000);
     }
-
-    @Test(dataProvider = "dataCustomers", dataProviderClass = CustomerDataProviders.class)
+    @Test(
+            dataProvider = "dataCustomers",
+            dataProviderClass = CustomerDataProviders.class,
+            description = "Создание нового Кастомера, а затем проверка на его добавление в список Кастомеров (П.1 чек-листа)"
+    )
     public void create_new_customer_and_check_him(CustomerData customer) {
-        click_addCustomer();
-
         ManagerPage managerPage = page(new ManagerPage());
 
         managerPage
@@ -55,10 +49,10 @@ public class CustomerTests extends BaseTest {
         sleep(3000);
     }
 
-    @Test
+    @Test(
+            description = "Создание нового Кастомера, а после попытка создания Кастомера с такими же данными и проверка на сообщение о дубликате"
+    )
     public void create_duplicate_customer() {
-        click_addCustomer();
-
         CustomerData customer = CustomerData.generateRandomCustomer();
 
         AddCustomerSubPage addCustomerSubPage = page(new ManagerPage())
@@ -68,17 +62,17 @@ public class CustomerTests extends BaseTest {
                 .addNewCustomer(customer)
                 .checkSuccessAlert();
 
-
-
         addCustomerSubPage
                 .addNewCustomer(customer)
                 .checkDuplicateAlert();
     }
 
-    @Test(dataProvider = "emptyFieldsCustomers", dataProviderClass = CustomerDataProviders.class)
+    @Test(
+            dataProvider = "emptyFieldsCustomers",
+            dataProviderClass = CustomerDataProviders.class,
+            description = "Попытка создания Кастомера с одним пустым полем и проверка на сообщение об ошибке"
+    )
     public void try_create_new_customer_but_empty_field(CustomerData customer, String fieldName) {
-        click_addCustomer();
-
         AddCustomerSubPage addCustomerSubPage = page(new ManagerPage())
                 .checkManagerPage()
                 .clickAddCustomerButton()

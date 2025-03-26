@@ -1,4 +1,8 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
-<suite name="Test Suite">
-
+<suite name="Checklist point 1 tests">
+    <test name="Check 1">
+        <classes>
+            <class name="tests.CustomerTests"/>
+        </classes>
+    </test>
 </suite>
