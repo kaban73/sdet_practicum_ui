@@ -1,6 +1,7 @@
 package tests;
 
 import com.codeborne.selenide.Configuration;
+import elements.AddCustomerSubPage;
 import org.openqa.selenium.Alert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -31,7 +32,7 @@ public class CustomerTests extends BaseTest {
     }
 
     @Test
-    public void create_customer_and_check_him() {
+    public void create_new_customer_and_check_him() {
         click_addCustomer();
 
         ManagerPage managerPage = page(new ManagerPage());
@@ -43,7 +44,10 @@ public class CustomerTests extends BaseTest {
                 .checkManagerPage()
                 .clickAddCustomerButton()
                 .checkAddCustomerForm()
-                .addNewCustomer(firstName, lastName, postCode);
+                .setFirstName(firstName)
+                .setLastName(lastName)
+                .setPostCode(postCode)
+                .clickAddCustomerButton();
 
         Alert alert = webdriver().driver().switchTo().alert();
         assert(alert.getText().contains("Customer added successfully"));
@@ -54,6 +58,59 @@ public class CustomerTests extends BaseTest {
                 .checkCustomersTable()
                 .searchCustomer(postCode)
                 .checkCustomerExists(firstName, lastName, postCode);
+
+        sleep(3000);
+    }
+
+    @Test
+    public void create_duplicate_customer() {
+        click_addCustomer();
+
+        String postCode = generateRandomPostCode();
+        String firstName = generateFirstNameFromPostCode(postCode);
+        String lastName = "Test LastName";
+
+        AddCustomerSubPage addCustomerSubPage = page(new ManagerPage())
+                .checkManagerPage()
+                .clickAddCustomerButton()
+                .checkAddCustomerForm()
+                .setFirstName(firstName)
+                .setLastName(lastName)
+                .setPostCode(postCode)
+                .clickAddCustomerButton();
+
+        Alert alert = webdriver().driver().switchTo().alert();
+        assert(alert.getText().contains("Customer added successfully"));
+        alert.accept();
+
+        addCustomerSubPage
+                .setFirstName(firstName)
+                .setLastName(lastName)
+                .setPostCode(postCode)
+                .clickAddCustomerButton();
+
+        alert = webdriver().driver().switchTo().alert();
+        assert(alert.getText().contains("Customer may be duplicate"));
+        alert.accept();
+
+        sleep(3000);
+    }
+
+    @Test
+    public void try_create_new_customer_but_empty_field() {
+        click_addCustomer();
+
+        String postCode = generateRandomPostCode();
+        String lastName = "Test LastName";
+
+        page(new ManagerPage())
+                .checkManagerPage()
+                .clickAddCustomerButton()
+                .checkAddCustomerForm()
+                .setLastName(lastName)
+                .setPostCode(postCode)
+                .clickAddCustomerButton()
+                .checkEmptyFirstName();
 
         sleep(3000);
     }
