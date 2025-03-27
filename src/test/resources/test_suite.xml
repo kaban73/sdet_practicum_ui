@@ -2,7 +2,7 @@
 <suite name="Checklist point 1 tests">
     <test name="Check 1">
         <classes>
-            <class name="tests.CustomerTests"/>
+            <class name="tests.CustomerCreateTests"/>
         </classes>
     </test>
 </suite>

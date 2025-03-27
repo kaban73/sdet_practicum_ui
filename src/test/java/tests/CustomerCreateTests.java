@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 import pages.ManagerPage;
 import static com.codeborne.selenide.Selenide.*;
 
-public class CustomerTests extends BaseTest {
+public class CustomerCreateTests extends BaseTest {
     @BeforeMethod
     void initBeforeMethod() {
         open(Configuration.baseUrl);
