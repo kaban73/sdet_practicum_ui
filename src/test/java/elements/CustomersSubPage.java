@@ -6,6 +6,7 @@ import model.CustomerData;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
 
+import java.time.Duration;
 import java.util.List;
 
 import static com.codeborne.selenide.Condition.exist;
@@ -22,7 +23,7 @@ public class CustomersSubPage {
     @FindBy(xpath= "//tr//td[1]")
     private ElementsCollection firstTableColumn;
     public CustomersSubPage checkCustomersTable() {
-        customersTable.shouldBe(visible);
+        customersTable.shouldBe(visible, Duration.ofSeconds(3));
         return this;
     }
 
