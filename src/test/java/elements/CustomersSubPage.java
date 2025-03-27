@@ -36,8 +36,19 @@ public class CustomersSubPage {
         return this;
     }
 
-    public CustomersSubPage searchCustomer(String postCode) {
+    public CustomersSubPage checkCustomerNotExistsForFirstName(String firstName) {
+        $(By.xpath("//tr[td[1][contains(., '"+firstName+"')]]"))
+                .shouldNotBe(exist);
+        return this;
+    }
+
+    public CustomersSubPage searchCustomerForPostCode(String postCode) {
         customersPlaceholder.type(postCode);
+        return this;
+    }
+
+    public CustomersSubPage searchCustomerForFirstName(String firstName) {
+        customersPlaceholder.type(firstName);
         return this;
     }
 
@@ -52,5 +63,17 @@ public class CustomersSubPage {
         List<String> list = firstTableColumn.texts();
         list.remove(0);
         return list;
+    }
+    
+    public CustomersSubPage deleteCustomerForFirstName(String firstName) {
+        $(By.xpath(
+                "//tr[td[1][text()='"
+                        + firstName +
+                        "']]//button[contains(@ng-click, 'deleteCust')]"
+        ))
+                .shouldBe(visible)
+                .click();
+
+        return this;
     }
 }

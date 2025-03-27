@@ -44,7 +44,7 @@ public class CustomerCreateTests extends BaseTest {
         managerPage
                 .clickShowCustomerButton()
                 .checkCustomersTable()
-                .searchCustomer(customer.getPostCode())
+                .searchCustomerForPostCode(customer.getPostCode())
                 .checkCustomerExists(customer);
 
         sleep(3000);
