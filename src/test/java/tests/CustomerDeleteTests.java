@@ -3,6 +3,10 @@ package tests;
 import com.codeborne.selenide.Configuration;
 import dataproviders.CustomerDataProviders;
 import elements.CustomersSubPage;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import model.CustomerData;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -14,15 +18,17 @@ import java.util.List;
 
 import static com.codeborne.selenide.Selenide.*;
 
+@Epic("Операции с кастомерами")
+@Feature("Удаление кастомеров")
 public class CustomerDeleteTests extends BaseTest {
     @BeforeMethod
     void initBeforeMethod() {
         open(Configuration.baseUrl);
     }
 
-    @Test(
-            description = "Нахождение имени, подходящего по условию, и удаление кастомера с этим именем, проверка на удаление этого кастомера"
-    )
+    @Test
+    @Description("Нахождение имени, подходящего по условию, и удаление кастомера с этим именем, проверка на удаление этого кастомера")
+    @Story("Удаление кастомера из начального списка кастомеров")
     public void delete_in_initial_customers() {
         prepareDefaultCustomer();
 
@@ -40,9 +46,10 @@ public class CustomerDeleteTests extends BaseTest {
 
     @Test(
             dataProvider = "dataCustomers",
-            dataProviderClass = CustomerDataProviders.class,
-            description = "Добавление нового кастомера, нахождение имени, подходящего по условию, и удаление кастомера с этим именем, проверка на удаление этого кастомера"
+            dataProviderClass = CustomerDataProviders.class
     )
+    @Description("Добавление нового кастомера, нахождение имени, подходящего по условию, и удаление кастомера с этим именем, проверка на удаление этого кастомера")
+    @Story("Удаление кастомера из нового списка кастомеров")
     public void delete_in_new_customers(CustomerData customer) {
         prepareNewCustomer(customer);
 

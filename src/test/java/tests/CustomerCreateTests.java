@@ -3,6 +3,10 @@ package tests;
 import com.codeborne.selenide.Configuration;
 import dataproviders.CustomerDataProviders;
 import elements.AddCustomerSubPage;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import model.CustomerData;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -10,14 +14,12 @@ import org.testng.annotations.Test;
 import pages.ManagerPage;
 import static com.codeborne.selenide.Selenide.*;
 
+@Epic("Операции с кастомерами")
+@Feature("Создание кастомеров")
 public class CustomerCreateTests extends BaseTest {
     @BeforeMethod
-    void initBeforeMethod() {
-        open(Configuration.baseUrl);
-    }
-
-    @BeforeMethod
     private void openAddCustomerForm() {
+        open(Configuration.baseUrl);
         page(new ManagerPage())
                 .checkManagerPage()
                 .clickAddCustomerButton()
@@ -25,9 +27,10 @@ public class CustomerCreateTests extends BaseTest {
     }
     @Test(
             dataProvider = "dataCustomers",
-            dataProviderClass = CustomerDataProviders.class,
-            description = "Создание нового Кастомера, а затем проверка на его добавление в список Кастомеров (П.1 чек-листа)"
+            dataProviderClass = CustomerDataProviders.class
     )
+    @Description("Создание нового Кастомера, а затем проверка на его добавление в список Кастомеров (П.1 чек-листа)")
+    @Story("Успешное создание кастомера")
     public void create_new_customer_and_check_him(CustomerData customer) {
         ManagerPage managerPage = page(new ManagerPage());
 
@@ -50,9 +53,9 @@ public class CustomerCreateTests extends BaseTest {
         sleep(3000);
     }
 
-    @Test(
-            description = "Создание нового Кастомера, а после попытка создания Кастомера с такими же данными и проверка на сообщение о дубликате"
-    )
+    @Test
+    @Description("Создание нового Кастомера, а после попытка создания Кастомера с такими же данными и проверка на сообщение о дубликате")
+    @Story("Попытка создания дубликата кастомера")
     public void create_duplicate_customer() {
         CustomerData customer = CustomerData.generateRandomCustomer();
 
@@ -70,9 +73,10 @@ public class CustomerCreateTests extends BaseTest {
 
     @Test(
             dataProvider = "emptyFieldsCustomers",
-            dataProviderClass = CustomerDataProviders.class,
-            description = "Попытка создания Кастомера с одним пустым полем и проверка на сообщение об ошибке"
+            dataProviderClass = CustomerDataProviders.class
     )
+    @Description("Попытка создания Кастомера с одним пустым полем и проверка на сообщение об ошибке")
+    @Story("Попытка создания кастомера с пустыми полями")
     public void try_create_new_customer_but_empty_field(CustomerData customer, String fieldName) {
         AddCustomerSubPage addCustomerSubPage = page(new ManagerPage())
                 .checkManagerPage()

@@ -4,6 +4,10 @@ import com.codeborne.selenide.Configuration;
 import static com.codeborne.selenide.Selenide.*;
 import dataproviders.CustomerDataProviders;
 import elements.CustomersSubPage;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import model.CustomerData;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -13,14 +17,16 @@ import java.util.List;
 import static org.testng.AssertJUnit.assertFalse;
 import static org.testng.AssertJUnit.assertTrue;
 
+@Epic("Операции с кастомерами")
+@Feature("Сортировка кастомеров")
 public class CustomerSortTests extends BaseTest {
     @BeforeMethod
     void initBeforeMethod() {
         open(Configuration.baseUrl);
     }
-    @Test(
-            description = "Проверка сортировки дефолтных кастомеров по убыванию"
-    )
+    @Test
+    @Description("Проверка сортировки дефолтных кастомеров по убыванию")
+    @Story("Сортировка списка кастомеров по убыванию")
     public void customers_list_descending_sort_by_firstName() {
         prepareDefaultCustomer();
 
@@ -31,9 +37,9 @@ public class CustomerSortTests extends BaseTest {
         assertTrue(isSortedDescending(customersDescendingList));
     }
 
-    @Test(
-            description = "Проверка сортировки дефолтных кастомеров по возрастанию"
-    )
+    @Test
+    @Description("Проверка сортировки дефолтных кастомеров по возрастанию")
+    @Story("Сортировка списка кастомеров по возрастанию")
     public void customers_list_ascending_sort_by_firstName() {
         prepareDefaultCustomer();
 
@@ -47,9 +53,10 @@ public class CustomerSortTests extends BaseTest {
 
     @Test(
             dataProvider = "dataCustomers",
-            dataProviderClass = CustomerDataProviders.class,
-            description = "Добавление нового кастомера и проверка сортировки кастомеров по убыванию"
+            dataProviderClass = CustomerDataProviders.class
     )
+    @Description("Добавление нового кастомера и проверка сортировки кастомеров по убыванию")
+    @Story("Сортировка нового списка кастомеров по убыванию")
     public void customers_list_descending_sort_by_firstName_with_new_customers(CustomerData customer) {
         prepareNewCustomer(customer);
 
@@ -62,9 +69,10 @@ public class CustomerSortTests extends BaseTest {
 
     @Test(
             dataProvider = "dataCustomers",
-            dataProviderClass = CustomerDataProviders.class,
-            description = "Добавление нового кастомера и проверка сортировки кастомеров по возрастанию"
+            dataProviderClass = CustomerDataProviders.class
     )
+    @Description("Добавление нового кастомера и проверка сортировки кастомеров по возрастанию")
+    @Story("Сортировка нового списка кастомеров по возрастанию")
     public void customers_list_ascending_sort_by_firstName_with_new_customers(CustomerData customer) {
         prepareNewCustomer(customer);
 

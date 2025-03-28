@@ -50,7 +50,7 @@ public class AddCustomerSubPage {
 
     public AddCustomerSubPage clickAddCustomerButton() {
         addCustomerButtonForm
-                .shouldHave(visible)
+                .shouldBe(visible)
                 .click();
         return this;
     }
