@@ -1,6 +1,5 @@
 package tests;
 
-import com.codeborne.selenide.Configuration;
 import dataproviders.CustomerDataProviders;
 import elements.AddCustomerSubPage;
 import io.qameta.allure.Description;
@@ -8,7 +7,6 @@ import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import model.CustomerData;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pages.ManagerPage;
@@ -17,13 +15,15 @@ import static com.codeborne.selenide.Selenide.*;
 @Epic("Операции с кастомерами")
 @Feature("Создание кастомеров")
 public class CustomerCreateTests extends BaseTest {
+    private ManagerPage managerPage;
+    private AddCustomerSubPage addCustomerSubPage;
     @BeforeMethod
     private void openAddCustomerForm() {
-        open(Configuration.baseUrl);
-        page(new ManagerPage())
+        managerPage = page(ManagerPage.class);
+        addCustomerSubPage = managerPage
                 .checkManagerPage()
-                .clickAddCustomerButton()
-                .checkAddCustomerForm();
+                .clickAddCustomerButton();
+        addCustomerSubPage.checkAddCustomerForm();
     }
     @Test(
             dataProvider = "dataCustomers",
@@ -32,12 +32,7 @@ public class CustomerCreateTests extends BaseTest {
     @Description("Создание нового Кастомера, а затем проверка на его добавление в список Кастомеров (П.1 чек-листа)")
     @Story("Успешное создание кастомера")
     public void create_new_customer_and_check_him(CustomerData customer) {
-        ManagerPage managerPage = page(new ManagerPage());
-
-        managerPage
-                .checkManagerPage()
-                .clickAddCustomerButton()
-                .checkAddCustomerForm()
+        addCustomerSubPage
                 .setFirstName(customer.getFirstName())
                 .setLastName(customer.getLastName())
                 .setPostCode(customer.getPostCode())
@@ -49,8 +44,6 @@ public class CustomerCreateTests extends BaseTest {
                 .checkCustomersTable()
                 .searchCustomerForPostCode(customer.getPostCode())
                 .checkCustomerExists(customer);
-
-        sleep(3000);
     }
 
     @Test
@@ -59,10 +52,7 @@ public class CustomerCreateTests extends BaseTest {
     public void create_duplicate_customer() {
         CustomerData customer = CustomerData.generateRandomCustomer();
 
-        AddCustomerSubPage addCustomerSubPage = page(new ManagerPage())
-                .checkManagerPage()
-                .clickAddCustomerButton()
-                .checkAddCustomerForm()
+        addCustomerSubPage
                 .addNewCustomer(customer)
                 .checkSuccessAlert();
 
@@ -78,10 +68,7 @@ public class CustomerCreateTests extends BaseTest {
     @Description("Попытка создания Кастомера с одним пустым полем и проверка на сообщение об ошибке")
     @Story("Попытка создания кастомера с пустыми полями")
     public void try_create_new_customer_but_empty_field(CustomerData customer, String fieldName) {
-        AddCustomerSubPage addCustomerSubPage = page(new ManagerPage())
-                .checkManagerPage()
-                .clickAddCustomerButton()
-                .checkAddCustomerForm()
+        addCustomerSubPage
                 .setFirstName(customer.getFirstName())
                 .setLastName(customer.getLastName())
                 .setPostCode(customer.getPostCode());
@@ -100,11 +87,5 @@ public class CustomerCreateTests extends BaseTest {
 
         addCustomerSubPage
                 .clickAddCustomerButton();
-    }
-
-    @AfterMethod
-    public void cleanupAfterEachTest() {
-        clearBrowserCookies();
-        clearBrowserLocalStorage();
     }
 }

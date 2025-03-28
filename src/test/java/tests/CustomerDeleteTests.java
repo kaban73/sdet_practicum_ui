@@ -1,6 +1,5 @@
 package tests;
 
-import com.codeborne.selenide.Configuration;
 import dataproviders.CustomerDataProviders;
 import elements.CustomersSubPage;
 import io.qameta.allure.Description;
@@ -8,7 +7,6 @@ import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import model.CustomerData;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pages.ManagerPage;
@@ -21,9 +19,13 @@ import static com.codeborne.selenide.Selenide.*;
 @Epic("Операции с кастомерами")
 @Feature("Удаление кастомеров")
 public class CustomerDeleteTests extends BaseTest {
+    private ManagerPage managerPage;
+    private CustomersSubPage customersSubPage;
     @BeforeMethod
     void initBeforeMethod() {
-        open(Configuration.baseUrl);
+        managerPage = page(ManagerPage.class);
+        customersSubPage = page(CustomersSubPage.class);
+        managerPage.checkManagerPage();
     }
 
     @Test
@@ -31,8 +33,6 @@ public class CustomerDeleteTests extends BaseTest {
     @Story("Удаление кастомера из начального списка кастомеров")
     public void delete_in_initial_customers() {
         prepareDefaultCustomer();
-
-        CustomersSubPage customersSubPage = page(new CustomersSubPage());
 
         List<String> customersFirstNamesList = customersSubPage.getCustomersFirstNames();
 
@@ -53,8 +53,6 @@ public class CustomerDeleteTests extends BaseTest {
     public void delete_in_new_customers(CustomerData customer) {
         prepareNewCustomer(customer);
 
-        CustomersSubPage customersSubPage = page(new CustomersSubPage());
-
         List<String> customersFirstNamesList = customersSubPage.getCustomersFirstNames();
 
         String deleteFirstName = findNameClosestToAverage(customersFirstNamesList);
@@ -66,14 +64,14 @@ public class CustomerDeleteTests extends BaseTest {
     }
 
     private void prepareDefaultCustomer() {
-        page(new ManagerPage())
+        managerPage
                 .checkManagerPage()
                 .clickShowCustomerButton()
                 .checkCustomersTable();
     }
 
     private void prepareNewCustomer(CustomerData customer) {
-        page(new ManagerPage())
+        managerPage
                 .checkManagerPage()
                 .clickAddCustomerButton()
                 .addNewCustomer(customer);
@@ -91,11 +89,5 @@ public class CustomerDeleteTests extends BaseTest {
                         name -> Math.abs(name.length() - average)
                 ))
                 .orElseThrow();
-    }
-
-    @AfterMethod
-    public void cleanupAfterEachTest() {
-        clearBrowserCookies();
-        clearBrowserLocalStorage();
     }
 }

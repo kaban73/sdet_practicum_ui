@@ -1,6 +1,5 @@
 package tests;
 
-import com.codeborne.selenide.Configuration;
 import static com.codeborne.selenide.Selenide.*;
 import dataproviders.CustomerDataProviders;
 import elements.CustomersSubPage;
@@ -9,7 +8,6 @@ import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import model.CustomerData;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pages.ManagerPage;
@@ -20,9 +18,13 @@ import static org.testng.AssertJUnit.assertTrue;
 @Epic("Операции с кастомерами")
 @Feature("Сортировка кастомеров")
 public class CustomerSortTests extends BaseTest {
+    private ManagerPage managerPage;
+    private CustomersSubPage customersSubPage;
     @BeforeMethod
     void initBeforeMethod() {
-        open(Configuration.baseUrl);
+        managerPage = page(ManagerPage.class);
+        customersSubPage = page(CustomersSubPage.class);
+        managerPage.checkManagerPage();
     }
     @Test
     @Description("Проверка сортировки дефолтных кастомеров по убыванию")
@@ -31,7 +33,7 @@ public class CustomerSortTests extends BaseTest {
         prepareDefaultCustomer();
 
         List<String> customersDescendingList =
-                page(new CustomersSubPage())
+                customersSubPage
                 .clickTheadFirstName()
                 .getCustomersFirstNames();
         assertTrue(isSortedDescending(customersDescendingList));
@@ -44,7 +46,7 @@ public class CustomerSortTests extends BaseTest {
         prepareDefaultCustomer();
 
         List<String> customersDescendingList =
-                page(new CustomersSubPage())
+                customersSubPage
                         .clickTheadFirstName()
                         .clickTheadFirstName()
                         .getCustomersFirstNames();
@@ -61,7 +63,7 @@ public class CustomerSortTests extends BaseTest {
         prepareNewCustomer(customer);
 
         List<String> customersDescendingList =
-                page(new CustomersSubPage())
+                customersSubPage
                         .clickTheadFirstName()
                         .getCustomersFirstNames();
         assertTrue(isSortedDescending(customersDescendingList));
@@ -77,7 +79,7 @@ public class CustomerSortTests extends BaseTest {
         prepareNewCustomer(customer);
 
         List<String> customersDescendingList =
-                page(new CustomersSubPage())
+                customersSubPage
                         .clickTheadFirstName()
                         .clickTheadFirstName()
                         .getCustomersFirstNames();
@@ -85,14 +87,14 @@ public class CustomerSortTests extends BaseTest {
     }
 
     private void prepareDefaultCustomer() {
-        page(new ManagerPage())
+        managerPage
                 .checkManagerPage()
                 .clickShowCustomerButton()
                 .checkCustomersTable();
     }
 
     private void prepareNewCustomer(CustomerData customer) {
-        page(new ManagerPage())
+        managerPage
                 .checkManagerPage()
                 .clickAddCustomerButton()
                 .addNewCustomer(customer);
@@ -106,11 +108,5 @@ public class CustomerSortTests extends BaseTest {
             }
         }
         return true;
-    }
-
-    @AfterMethod
-    public void cleanupAfterEachTest() {
-        clearBrowserCookies();
-        clearBrowserLocalStorage();
     }
 }
