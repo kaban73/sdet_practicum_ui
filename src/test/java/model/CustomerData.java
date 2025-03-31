@@ -1,7 +1,5 @@
 package model;
 
-import utils.CustomerDataGenerator;
-
 public class CustomerData {
     private String firstName;
     private String lastName;
@@ -24,11 +22,5 @@ public class CustomerData {
     }
     public void setPostCode(String postCode) {
         this.postCode = postCode;
-    }
-
-    public static CustomerData generateRandomCustomer() {
-        String postCode = CustomerDataGenerator.generateRandomPostCode();
-        String firstName = CustomerDataGenerator.generateFirstNameFromPostCode(postCode);
-        return new CustomerData(firstName, "TestLastName", postCode);
     }
 }

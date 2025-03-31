@@ -17,10 +17,8 @@ import java.util.List;
 import static com.codeborne.selenide.Selenide.*;
 
 @Epic("Операции с кастомерами")
-@Feature("Удаление кастомеров")
+@Story("Удаление кастомеров")
 public class CustomerDeleteTests extends BaseTest {
-    private ManagerPage managerPage;
-    private CustomersSubPage customersSubPage;
     @BeforeMethod
     void initBeforeMethod() {
         managerPage = page(ManagerPage.class);
@@ -30,9 +28,9 @@ public class CustomerDeleteTests extends BaseTest {
 
     @Test
     @Description("Нахождение имени, подходящего по условию, и удаление кастомера с этим именем, проверка на удаление этого кастомера")
-    @Story("Удаление кастомера из начального списка кастомеров")
-    public void delete_in_initial_customers() {
-        prepareDefaultCustomer();
+    @Feature("Удаление кастомера из начального списка кастомеров")
+    public void testDeleteCustomerFromInitialList() {
+        managerPage.prepareDefaultCustomer();
 
         List<String> customersFirstNamesList = customersSubPage.getCustomersFirstNames();
 
@@ -49,33 +47,18 @@ public class CustomerDeleteTests extends BaseTest {
             dataProviderClass = CustomerDataProviders.class
     )
     @Description("Добавление нового кастомера, нахождение имени, подходящего по условию, и удаление кастомера с этим именем, проверка на удаление этого кастомера")
-    @Story("Удаление кастомера из нового списка кастомеров")
-    public void delete_in_new_customers(CustomerData customer) {
-        prepareNewCustomer(customer);
+    @Feature("Удаление кастомера из нового списка кастомеров")
+    public void testDeleteCustomerFromNewList(CustomerData customer) {
+        managerPage.prepareNewCustomer(customer);
 
         List<String> customersFirstNamesList = customersSubPage.getCustomersFirstNames();
 
-        String deleteFirstName = findNameClosestToAverage(customersFirstNamesList);
+        String nameForDelete = findNameClosestToAverage(customersFirstNamesList);
 
         customersSubPage
-                .deleteCustomerForFirstName(deleteFirstName)
-                .searchCustomerForFirstName(deleteFirstName)
-                .checkCustomerNotExistsForFirstName(deleteFirstName);
-    }
-
-    private void prepareDefaultCustomer() {
-        managerPage
-                .checkManagerPage()
-                .clickShowCustomerButton()
-                .checkCustomersTable();
-    }
-
-    private void prepareNewCustomer(CustomerData customer) {
-        managerPage
-                .checkManagerPage()
-                .clickAddCustomerButton()
-                .addNewCustomer(customer);
-        prepareDefaultCustomer();
+                .deleteCustomerForFirstName(nameForDelete)
+                .searchCustomerForFirstName(nameForDelete)
+                .checkCustomerNotExistsForFirstName(nameForDelete);
     }
 
     private String findNameClosestToAverage(List<String> names) {

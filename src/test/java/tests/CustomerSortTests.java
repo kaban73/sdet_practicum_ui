@@ -12,14 +12,14 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pages.ManagerPage;
 import java.util.List;
+import java.util.stream.IntStream;
+
 import static org.testng.AssertJUnit.assertFalse;
 import static org.testng.AssertJUnit.assertTrue;
 
 @Epic("Операции с кастомерами")
-@Feature("Сортировка кастомеров")
+@Story("Сортировка кастомеров")
 public class CustomerSortTests extends BaseTest {
-    private ManagerPage managerPage;
-    private CustomersSubPage customersSubPage;
     @BeforeMethod
     void initBeforeMethod() {
         managerPage = page(ManagerPage.class);
@@ -28,9 +28,9 @@ public class CustomerSortTests extends BaseTest {
     }
     @Test
     @Description("Проверка сортировки дефолтных кастомеров по убыванию")
-    @Story("Сортировка списка кастомеров по убыванию")
-    public void customers_list_descending_sort_by_firstName() {
-        prepareDefaultCustomer();
+    @Feature("Сортировка списка кастомеров по убыванию")
+    public void testDefaultCustomersSortedDescending() {
+        managerPage.prepareDefaultCustomer();
 
         List<String> customersDescendingList =
                 customersSubPage
@@ -41,9 +41,9 @@ public class CustomerSortTests extends BaseTest {
 
     @Test
     @Description("Проверка сортировки дефолтных кастомеров по возрастанию")
-    @Story("Сортировка списка кастомеров по возрастанию")
-    public void customers_list_ascending_sort_by_firstName() {
-        prepareDefaultCustomer();
+    @Feature("Сортировка списка кастомеров по возрастанию")
+    public void testDefaultCustomersSortedAscending() {
+        managerPage.prepareDefaultCustomer();
 
         List<String> customersDescendingList =
                 customersSubPage
@@ -58,9 +58,9 @@ public class CustomerSortTests extends BaseTest {
             dataProviderClass = CustomerDataProviders.class
     )
     @Description("Добавление нового кастомера и проверка сортировки кастомеров по убыванию")
-    @Story("Сортировка нового списка кастомеров по убыванию")
-    public void customers_list_descending_sort_by_firstName_with_new_customers(CustomerData customer) {
-        prepareNewCustomer(customer);
+    @Feature("Сортировка нового списка кастомеров по убыванию")
+    public void testNewCustomersSortedDescending(CustomerData customer) {
+        managerPage.prepareNewCustomer(customer);
 
         List<String> customersDescendingList =
                 customersSubPage
@@ -74,9 +74,9 @@ public class CustomerSortTests extends BaseTest {
             dataProviderClass = CustomerDataProviders.class
     )
     @Description("Добавление нового кастомера и проверка сортировки кастомеров по возрастанию")
-    @Story("Сортировка нового списка кастомеров по возрастанию")
-    public void customers_list_ascending_sort_by_firstName_with_new_customers(CustomerData customer) {
-        prepareNewCustomer(customer);
+    @Feature("Сортировка нового списка кастомеров по возрастанию")
+    public void testNewCustomersSortedAscending(CustomerData customer) {
+        managerPage.prepareNewCustomer(customer);
 
         List<String> customersDescendingList =
                 customersSubPage
@@ -86,27 +86,9 @@ public class CustomerSortTests extends BaseTest {
         assertFalse(isSortedDescending(customersDescendingList));
     }
 
-    private void prepareDefaultCustomer() {
-        managerPage
-                .checkManagerPage()
-                .clickShowCustomerButton()
-                .checkCustomersTable();
-    }
-
-    private void prepareNewCustomer(CustomerData customer) {
-        managerPage
-                .checkManagerPage()
-                .clickAddCustomerButton()
-                .addNewCustomer(customer);
-        prepareDefaultCustomer();
-    }
-
     private boolean isSortedDescending(List<String> list) {
-        for (int i = 0; i < list.size() - 1; i++) {
-            if (list.get(i).toLowerCase().compareTo(list.get(i + 1).toLowerCase()) < 0) {
-                return false;
-            }
-        }
-        return true;
+        return IntStream.range(0, list.size() - 1)
+                .allMatch(i -> list.get(i).toLowerCase()
+                        .compareTo(list.get(i + 1).toLowerCase()) >= 0);
     }
 }

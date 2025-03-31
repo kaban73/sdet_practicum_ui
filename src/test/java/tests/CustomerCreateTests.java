@@ -1,7 +1,6 @@
 package tests;
 
 import dataproviders.CustomerDataProviders;
-import elements.AddCustomerSubPage;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
@@ -10,29 +9,30 @@ import model.CustomerData;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pages.ManagerPage;
+import utils.CustomerDataGenerator;
+
 import static com.codeborne.selenide.Selenide.*;
 
 @Epic("Операции с кастомерами")
-@Feature("Создание кастомеров")
+@Story("Создание кастомеров")
 public class CustomerCreateTests extends BaseTest {
-    private ManagerPage managerPage;
-    private AddCustomerSubPage addCustomerSubPage;
     @BeforeMethod
     private void openAddCustomerForm() {
         managerPage = page(ManagerPage.class);
-        addCustomerSubPage = managerPage
+        customerAddSubPage = managerPage
                 .checkManagerPage()
                 .clickAddCustomerButton();
-        addCustomerSubPage.checkAddCustomerForm();
+        customerAddSubPage.checkAddCustomerForm();
     }
+
     @Test(
             dataProvider = "dataCustomers",
             dataProviderClass = CustomerDataProviders.class
     )
     @Description("Создание нового Кастомера, а затем проверка на его добавление в список Кастомеров (П.1 чек-листа)")
-    @Story("Успешное создание кастомера")
-    public void create_new_customer_and_check_him(CustomerData customer) {
-        addCustomerSubPage
+    @Feature("Успешное создание кастомера")
+    public void testCreateNewCustomerAndVerifyInList(CustomerData customer) {
+        customerAddSubPage
                 .setFirstName(customer.getFirstName())
                 .setLastName(customer.getLastName())
                 .setPostCode(customer.getPostCode())
@@ -48,44 +48,64 @@ public class CustomerCreateTests extends BaseTest {
 
     @Test
     @Description("Создание нового Кастомера, а после попытка создания Кастомера с такими же данными и проверка на сообщение о дубликате")
-    @Story("Попытка создания дубликата кастомера")
-    public void create_duplicate_customer() {
-        CustomerData customer = CustomerData.generateRandomCustomer();
+    @Feature("Попытка создания дубликата кастомера")
+    public void testCreateDuplicateCustomer() {
+        CustomerData customer = CustomerDataGenerator.generateRandomCustomer();
 
-        addCustomerSubPage
+        customerAddSubPage
                 .addNewCustomer(customer)
                 .checkSuccessAlert();
 
-        addCustomerSubPage
+        customerAddSubPage
                 .addNewCustomer(customer)
                 .checkDuplicateAlert();
     }
 
-    @Test(
-            dataProvider = "emptyFieldsCustomers",
-            dataProviderClass = CustomerDataProviders.class
-    )
-    @Description("Попытка создания Кастомера с одним пустым полем и проверка на сообщение об ошибке")
-    @Story("Попытка создания кастомера с пустыми полями")
-    public void try_create_new_customer_but_empty_field(CustomerData customer, String fieldName) {
-        addCustomerSubPage
+    @Test
+    @Description("Попытка создания Кастомера с пустым полем имени и проверка на сообщение об ошибке")
+    @Feature("Попытка создания кастомера с пустым полем имени")
+    public void testCreateCustomerWithEmptyFirstNameField() {
+        CustomerData customer = CustomerDataGenerator.generateRandomCustomer();
+        customer.setFirstName("");
+
+        customerAddSubPage
                 .setFirstName(customer.getFirstName())
                 .setLastName(customer.getLastName())
-                .setPostCode(customer.getPostCode());
+                .setPostCode(customer.getPostCode())
+                .clickAddCustomerButton()
+                .checkEmptyFirstName();
 
-        switch (fieldName) {
-            case "firstName":
-                addCustomerSubPage.checkEmptyFirstName();
-                break;
-            case "lastName":
-                addCustomerSubPage.checkEmptyLastName();
-                break;
-            case "postCode":
-                addCustomerSubPage.checkEmptyPostCode();
-                break;
-        }
+    }
 
-        addCustomerSubPage
-                .clickAddCustomerButton();
+    @Test
+    @Description("Попытка создания Кастомера с пустым полем фамилии и проверка на сообщение об ошибке")
+    @Feature("Попытка создания кастомера с пустым полем фамилии")
+    public void testCreateCustomerWithEmptyLastNameField() {
+        CustomerData customer = CustomerDataGenerator.generateRandomCustomer();
+        customer.setLastName("");
+
+        customerAddSubPage
+                .setFirstName(customer.getFirstName())
+                .setLastName(customer.getLastName())
+                .setPostCode(customer.getPostCode())
+                .clickAddCustomerButton()
+                .checkEmptyLastName();
+
+    }
+
+    @Test
+    @Description("Попытка создания Кастомера с пустым полем почтового индекса и проверка на сообщение об ошибке")
+    @Feature("Попытка создания кастомера с пустым полем почтового индекса")
+    public void testCreateCustomerWithEmptyPostCodeField() {
+        CustomerData customer = CustomerDataGenerator.generateRandomCustomer();
+        customer.setPostCode("");
+
+        customerAddSubPage
+                .setFirstName(customer.getFirstName())
+                .setLastName(customer.getLastName())
+                .setPostCode(customer.getPostCode())
+                .clickAddCustomerButton()
+                .checkEmptyPostCode();
+
     }
 }
