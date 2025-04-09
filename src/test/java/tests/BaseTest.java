@@ -5,6 +5,8 @@ import com.codeborne.selenide.logevents.SelenideLogger;
 import elements.CustomerAddSubPage;
 import elements.CustomersSubPage;
 import io.qameta.allure.selenide.AllureSelenide;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -39,6 +41,20 @@ public class BaseTest {
         Configuration.headless = Boolean.parseBoolean(properties.getProperty("headless"));
         Configuration.reopenBrowserOnFail = Boolean.parseBoolean(properties.getProperty("reopenBrowserOnFail"));
 
+        if (isRunningInCI() && "firefox".equalsIgnoreCase(Configuration.browser)) {
+            Configuration.browserCapabilities = new FirefoxOptions();
+            Configuration.browserCapabilities.setCapability("marionette", true);
+        }
+
+        if (isRunningInCI() && "chrome".equalsIgnoreCase(Configuration.browser)) {
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--remote-allow-origins=*");
+            options.addArguments("--window-size=1920,1080");
+            Configuration.browserCapabilities = options;
+        }
+
         SelenideLogger.addListener("AllureSelenide", new AllureSelenide()
                 .screenshots(true)
                 .savePageSource(true)
@@ -54,5 +70,9 @@ public class BaseTest {
         clearBrowserCookies();
         clearBrowserLocalStorage();
         closeWebDriver();
+    }
+
+    private boolean isRunningInCI() {
+        return System.getenv("CI") != null && System.getenv("CI").equals("true");
     }
 }
